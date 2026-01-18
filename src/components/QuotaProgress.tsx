@@ -1,5 +1,3 @@
-"use client";
-
 import { formatCurrency, formatPercent } from "@/lib/utils";
 
 interface QuotaProgressProps {

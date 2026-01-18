@@ -1,12 +1,11 @@
-"use client";
+import Link from "next/link";
 
 interface StageFilterProps {
   selectedStage: string;
-  onStageChange: (stage: string) => void;
-  stages?: { value: string; label: string }[];
+  basePath?: string;
 }
 
-const defaultStages = [
+const stages = [
   { value: "", label: "All Stages" },
   { value: "COURTING", label: "Courting" },
   { value: "REGISTERED", label: "Registered" },
@@ -17,15 +16,14 @@ const defaultStages = [
 
 export default function StageFilter({
   selectedStage,
-  onStageChange,
-  stages = defaultStages,
+  basePath = "/deals",
 }: StageFilterProps) {
   return (
     <div className="flex flex-wrap gap-2">
       {stages.map((stage) => (
-        <button
+        <Link
           key={stage.value}
-          onClick={() => onStageChange(stage.value)}
+          href={stage.value ? `${basePath}?stage=${stage.value}` : basePath}
           className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             selectedStage === stage.value
               ? "bg-blue-600 text-white"
@@ -33,7 +31,7 @@ export default function StageFilter({
           }`}
         >
           {stage.label}
-        </button>
+        </Link>
       ))}
     </div>
   );

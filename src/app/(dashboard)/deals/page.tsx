@@ -1,52 +1,29 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import Link from "next/link";
+import { authOptions } from "@/lib/auth";
+import { getDeals } from "@/lib/data";
 import DealCard from "@/components/DealCard";
 import StageFilter from "@/components/StageFilter";
 
-interface Deal {
-  id: string;
-  dealName: string;
-  clientCompanyName: string;
-  dealValue: number;
-  grossProfit: number;
-  stage: string;
-  updatedAt: string;
+interface DealsPageProps {
+  searchParams: Promise<{ stage?: string }>;
 }
 
-export default function DealsPage() {
-  const { data: session } = useSession();
-  const [deals, setDeals] = useState<Deal[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedStage, setSelectedStage] = useState("");
+export default async function DealsPage({ searchParams }: DealsPageProps) {
+  const session = await getServerSession(authOptions);
 
-  useEffect(() => {
-    async function fetchDeals() {
-      setLoading(true);
-      try {
-        const url = selectedStage
-          ? `/api/deals?stage=${selectedStage}`
-          : "/api/deals";
-        const response = await fetch(url);
-        if (response.ok) {
-          const data = await response.json();
-          setDeals(data);
-        }
-      } catch (error) {
-        console.error("Error fetching deals:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchDeals();
-  }, [selectedStage]);
-
-  if (!session || session.user.role !== "SALES_REP") {
-    return null;
+  if (!session) {
+    redirect("/login");
   }
+
+  if (session.user.role !== "SALES_REP") {
+    redirect("/");
+  }
+
+  const { stage } = await searchParams;
+  const selectedStage = stage || "";
+  const deals = await getDeals(session.user.id, selectedStage || undefined);
 
   return (
     <div className="space-y-6">
@@ -61,27 +38,17 @@ export default function DealsPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow p-4">
-        <StageFilter
-          selectedStage={selectedStage}
-          onStageChange={setSelectedStage}
-        />
+        <StageFilter selectedStage={selectedStage} />
       </div>
 
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
-      ) : deals.length === 0 ? (
+      {deals.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-12 text-center">
           <p className="text-gray-500 mb-4">
             {selectedStage
               ? "No deals found in this stage."
               : "No deals yet."}
           </p>
-          <Link
-            href="/deals/new"
-            className="text-blue-600 hover:underline"
-          >
+          <Link href="/deals/new" className="text-blue-600 hover:underline">
             Create your first deal
           </Link>
         </div>
@@ -96,7 +63,7 @@ export default function DealsPage() {
               dealValue={deal.dealValue}
               grossProfit={deal.grossProfit}
               stage={deal.stage}
-              updatedAt={new Date(deal.updatedAt)}
+              updatedAt={deal.updatedAt}
             />
           ))}
         </div>

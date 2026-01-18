@@ -2,43 +2,9 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getDashboardStats } from "@/lib/data";
 import QuotaProgress from "@/components/QuotaProgress";
 import DealCard from "@/components/DealCard";
-
-async function getDashboardData(userId: string) {
-  const currentYear = new Date().getFullYear();
-  const startOfYear = new Date(currentYear, 0, 1);
-
-  // Get all WON deals for the current year
-  const wonDeals = await prisma.deal.findMany({
-    where: {
-      salesRepId: userId,
-      stage: "WON",
-      updatedAt: {
-        gte: startOfYear,
-      },
-    },
-  });
-
-  const ytdClosed = wonDeals.reduce((sum, deal) => sum + deal.dealValue, 0);
-
-  // Get deal counts by stage
-  const dealsByStage = await prisma.deal.groupBy({
-    by: ["stage"],
-    where: { salesRepId: userId },
-    _count: { stage: true },
-  });
-
-  // Get recent deals
-  const recentDeals = await prisma.deal.findMany({
-    where: { salesRepId: userId },
-    orderBy: { updatedAt: "desc" },
-    take: 5,
-  });
-
-  return { ytdClosed, dealsByStage, recentDeals };
-}
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -51,7 +17,7 @@ export default async function DashboardPage() {
     redirect("/client-portal");
   }
 
-  const { ytdClosed, dealsByStage, recentDeals } = await getDashboardData(
+  const { ytdClosed, dealsByStage, recentDeals } = await getDashboardStats(
     session.user.id
   );
 
