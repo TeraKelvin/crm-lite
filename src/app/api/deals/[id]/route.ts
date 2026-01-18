@@ -21,6 +21,12 @@ export async function GET(
         files: session.user.role === "CLIENT"
           ? { where: { category: "EXTERNAL" }, orderBy: { uploadedAt: "desc" } }
           : { orderBy: { uploadedAt: "desc" } },
+        contacts: session.user.role === "SALES_REP"
+          ? { orderBy: [{ isPrimary: "desc" }, { createdAt: "desc" }] }
+          : false,
+        competitors: session.user.role === "SALES_REP"
+          ? { orderBy: { createdAt: "desc" } }
+          : false,
       },
     });
 
@@ -84,7 +90,24 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { dealName, clientCompanyName, dealValue, grossProfit, stage } = body;
+    const {
+      dealName,
+      clientCompanyName,
+      dealValue,
+      grossProfit,
+      stage,
+      // Forecasting fields
+      expectedCloseDate,
+      probability,
+      forecastCategory,
+      // MEDDIC fields
+      meddic_metrics,
+      meddic_economicBuyer,
+      meddic_decisionCriteria,
+      meddic_decisionProcess,
+      meddic_identifyPain,
+      meddic_champion,
+    } = body;
 
     const deal = await prisma.deal.update({
       where: { id },
@@ -94,6 +117,19 @@ export async function PUT(
         ...(dealValue !== undefined && { dealValue: parseFloat(dealValue) }),
         ...(grossProfit !== undefined && { grossProfit: parseFloat(grossProfit) }),
         ...(stage && { stage }),
+        // Forecasting
+        ...(expectedCloseDate !== undefined && {
+          expectedCloseDate: expectedCloseDate ? new Date(expectedCloseDate) : null,
+        }),
+        ...(probability !== undefined && { probability: parseInt(probability) }),
+        ...(forecastCategory && { forecastCategory }),
+        // MEDDIC
+        ...(meddic_metrics !== undefined && { meddic_metrics }),
+        ...(meddic_economicBuyer !== undefined && { meddic_economicBuyer }),
+        ...(meddic_decisionCriteria !== undefined && { meddic_decisionCriteria }),
+        ...(meddic_decisionProcess !== undefined && { meddic_decisionProcess }),
+        ...(meddic_identifyPain !== undefined && { meddic_identifyPain }),
+        ...(meddic_champion !== undefined && { meddic_champion }),
       },
     });
 

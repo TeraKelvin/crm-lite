@@ -22,19 +22,62 @@ model User {
 }
 
 model Deal {
-  id                String   @id @default(uuid())
+  id                String    @id @default(uuid())
   salesRepId        String
   clientCompanyName String
   dealName          String
   dealValue         Float
   grossProfit       Float
-  stage             String   @default("COURTING")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  stage             String    @default("COURTING")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  salesRep   User       @relation(fields: [salesRepId], references: [id])
-  files      File[]
-  activities Activity[]
+  // Forecasting fields
+  expectedCloseDate DateTime?
+  probability       Int       @default(10) // 0-100%
+  forecastCategory  String    @default("PIPELINE") // COMMIT, BEST_CASE, PIPELINE, OMIT
+
+  // MEDDIC Qualification fields
+  meddic_metrics         String?  // Quantified business impact
+  meddic_economicBuyer   String?  // Who has budget authority
+  meddic_decisionCriteria String? // How they will decide
+  meddic_decisionProcess String?  // Steps/timeline to decision
+  meddic_identifyPain    String?  // Business pain points
+  meddic_champion        String?  // Internal advocate
+
+  salesRep    User         @relation(fields: [salesRepId], references: [id])
+  files       File[]
+  activities  Activity[]
+  contacts    Contact[]
+  competitors Competitor[]
+}
+
+model Contact {
+  id        String   @id @default(uuid())
+  dealId    String
+  name      String
+  title     String?
+  email     String?
+  phone     String?
+  role      String   @default("INFLUENCER") // CHAMPION, ECONOMIC_BUYER, TECHNICAL_BUYER, INFLUENCER, BLOCKER
+  notes     String?
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+}
+
+model Competitor {
+  id         String   @id @default(uuid())
+  dealId     String
+  name       String
+  strengths  String?
+  weaknesses String?
+  status     String   @default("ACTIVE") // ACTIVE, ELIMINATED, UNKNOWN
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
 }
 
 model Activity {
@@ -56,7 +99,7 @@ model File {
   dealId     String
   filename   String
   filepath   String
-  category   String   @default("INTERNAL")
+  category   String   @default("INTERNAL") // INTERNAL, PROPOSAL, CONTRACT, NDA, SECURITY, SOW
   uploadedAt DateTime @default(now())
 
   deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)

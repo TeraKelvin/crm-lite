@@ -64,6 +64,9 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
               grossProfit={deal.grossProfit}
               stage={deal.stage}
               updatedAt={deal.updatedAt}
+              probability={deal.probability}
+              expectedCloseDate={deal.expectedCloseDate}
+              forecastCategory={deal.forecastCategory}
             />
           ))}
         </div>

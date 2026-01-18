@@ -8,6 +8,10 @@ import FileUpload from "@/components/FileUpload";
 import FileList from "@/components/FileList";
 import ActivityForm from "@/components/ActivityForm";
 import ActivityTimeline from "@/components/ActivityTimeline";
+import ContactList from "@/components/ContactList";
+import CompetitorList from "@/components/CompetitorList";
+import MEDDICForm from "@/components/MEDDICForm";
+import ForecastingPanel from "@/components/ForecastingPanel";
 
 interface FileItem {
   id: string;
@@ -27,6 +31,26 @@ interface Activity {
   createdAt: string;
 }
 
+interface Contact {
+  id: string;
+  name: string;
+  title: string | null;
+  email: string | null;
+  phone: string | null;
+  role: string;
+  notes: string | null;
+  isPrimary: boolean;
+}
+
+interface Competitor {
+  id: string;
+  name: string;
+  strengths: string | null;
+  weaknesses: string | null;
+  status: string;
+  notes: string | null;
+}
+
 interface Deal {
   id: string;
   dealName: string;
@@ -36,7 +60,20 @@ interface Deal {
   stage: string;
   files: FileItem[];
   activities: Activity[];
+  contacts: Contact[];
+  competitors: Competitor[];
   updatedAt: string;
+  // Forecasting
+  expectedCloseDate: string | null;
+  probability: number;
+  forecastCategory: string;
+  // MEDDIC
+  meddic_metrics: string | null;
+  meddic_economicBuyer: string | null;
+  meddic_decisionCriteria: string | null;
+  meddic_decisionProcess: string | null;
+  meddic_identifyPain: string | null;
+  meddic_champion: string | null;
 }
 
 function getDaysSinceLastActivity(activities: Activity[], updatedAt: string): number {
@@ -264,6 +301,53 @@ export default function DealDetailPage({
         )}
 
         <ActivityTimeline activities={deal.activities} />
+      </div>
+
+      {/* Two-column layout for Stakeholders, Competitors, MEDDIC, Forecasting */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Column */}
+        <div className="space-y-6">
+          {/* Stakeholders / Contacts */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <ContactList contacts={deal.contacts || []} dealId={deal.id} />
+          </div>
+
+          {/* Competitors */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <CompetitorList competitors={deal.competitors || []} dealId={deal.id} />
+          </div>
+        </div>
+
+        {/* Right Column */}
+        <div className="space-y-6">
+          {/* Forecasting */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <ForecastingPanel
+              dealId={deal.id}
+              dealValue={deal.dealValue}
+              initialData={{
+                expectedCloseDate: deal.expectedCloseDate,
+                probability: deal.probability ?? 10,
+                forecastCategory: deal.forecastCategory ?? "PIPELINE",
+              }}
+            />
+          </div>
+
+          {/* MEDDIC Qualification */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <MEDDICForm
+              dealId={deal.id}
+              initialData={{
+                meddic_metrics: deal.meddic_metrics,
+                meddic_economicBuyer: deal.meddic_economicBuyer,
+                meddic_decisionCriteria: deal.meddic_decisionCriteria,
+                meddic_decisionProcess: deal.meddic_decisionProcess,
+                meddic_identifyPain: deal.meddic_identifyPain,
+                meddic_champion: deal.meddic_champion,
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Files */}
