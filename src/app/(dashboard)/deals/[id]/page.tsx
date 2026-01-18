@@ -1,0 +1,192 @@
+"use client";
+
+import { useState, useEffect, useCallback, use } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import DealForm from "@/components/DealForm";
+import FileUpload from "@/components/FileUpload";
+import FileList from "@/components/FileList";
+
+interface FileItem {
+  id: string;
+  filename: string;
+  category: "INTERNAL" | "EXTERNAL";
+  uploadedAt: string;
+}
+
+interface Deal {
+  id: string;
+  dealName: string;
+  clientCompanyName: string;
+  dealValue: number;
+  grossProfit: number;
+  stage: string;
+  files: FileItem[];
+}
+
+export default function DealDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [deal, setDeal] = useState<Deal | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+
+  const fetchDeal = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/deals/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setDeal(data);
+      } else if (response.status === 404) {
+        setError("Deal not found");
+      } else {
+        setError("Failed to load deal");
+      }
+    } catch {
+      setError("Failed to load deal");
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchDeal();
+  }, [fetchDeal]);
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this deal?")) return;
+
+    try {
+      const response = await fetch(`/api/deals/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        router.push("/deals");
+      } else {
+        alert("Failed to delete deal");
+      }
+    } catch {
+      alert("Failed to delete deal");
+    }
+  };
+
+  if (!session || session.user.role !== "SALES_REP") {
+    return null;
+  }
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error || !deal) {
+    return (
+      <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
+        {error || "Deal not found"}
+      </div>
+    );
+  }
+
+  const stageLabels: Record<string, string> = {
+    COURTING: "Courting",
+    REGISTERED: "Registered",
+    QUOTED: "Quoted",
+    WON: "Won",
+    CLOSED_LOST: "Closed/Lost",
+  };
+
+  const stageColors: Record<string, string> = {
+    COURTING: "bg-purple-100 text-purple-800",
+    REGISTERED: "bg-blue-100 text-blue-800",
+    QUOTED: "bg-yellow-100 text-yellow-800",
+    WON: "bg-green-100 text-green-800",
+    CLOSED_LOST: "bg-red-100 text-red-800",
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">{deal.dealName}</h1>
+          <p className="text-gray-600">{deal.clientCompanyName}</p>
+        </div>
+        <span
+          className={`px-3 py-1 rounded-full text-sm font-medium ${
+            stageColors[deal.stage]
+          }`}
+        >
+          {stageLabels[deal.stage]}
+        </span>
+      </div>
+
+      {isEditing ? (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Edit Deal
+          </h2>
+          <DealForm deal={deal} />
+          <button
+            onClick={() => setIsEditing(false)}
+            className="mt-4 text-gray-600 hover:text-gray-800"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">
+              Deal Details
+            </h2>
+            <div className="space-x-2">
+              <button
+                onClick={() => setIsEditing(true)}
+                className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+              >
+                Edit
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+          <dl className="grid grid-cols-2 gap-4">
+            <div>
+              <dt className="text-sm text-gray-500">Deal Value</dt>
+              <dd className="text-lg font-medium text-gray-900">
+                ${deal.dealValue.toLocaleString()}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm text-gray-500">Gross Profit</dt>
+              <dd className="text-lg font-medium text-gray-900">
+                ${deal.grossProfit.toLocaleString()}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      )}
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Files</h2>
+        <FileUpload dealId={deal.id} onUploadComplete={fetchDeal} />
+        <div className="mt-6">
+          <FileList files={deal.files} />
+        </div>
+      </div>
+    </div>
+  );
+}

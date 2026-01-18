@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("SALES_REP")
+  name         String
+  companyName  String?
+  salesGoal    Float    @default(500000)
+  createdAt    DateTime @default(now())
+
+  deals Deal[]
+}
+
+model Deal {
+  id                String   @id @default(uuid())
+  salesRepId        String
+  clientCompanyName String
+  dealName          String
+  dealValue         Float
+  grossProfit       Float
+  stage             String   @default("COURTING")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  salesRep User   @relation(fields: [salesRepId], references: [id])
+  files    File[]
+}
+
+model File {
+  id         String   @id @default(uuid())
+  dealId     String
+  filename   String
+  filepath   String
+  category   String   @default("INTERNAL")
+  uploadedAt DateTime @default(now())
+
+  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+}
