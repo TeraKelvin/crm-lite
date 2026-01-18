@@ -51,19 +51,19 @@ function CardContent({
       <p className="text-sm text-gray-600 mb-3">{clientCompanyName}</p>
       <div className="flex justify-between text-sm">
         <div>
-          <span className="text-gray-500">Value: </span>
-          <span className="font-medium text-gray-900">
+          <span className="text-gray-600 font-medium">Value: </span>
+          <span className="font-semibold text-gray-900">
             {formatCurrency(dealValue)}
           </span>
         </div>
         <div>
-          <span className="text-gray-500">GP: </span>
-          <span className="font-medium text-gray-900">
+          <span className="text-gray-600 font-medium">GP: </span>
+          <span className="font-semibold text-green-600">
             {formatCurrency(grossProfit)}
           </span>
         </div>
       </div>
-      <p className="text-xs text-gray-400 mt-2">
+      <p className="text-xs text-gray-500 mt-2">
         Updated {new Date(updatedAt).toLocaleDateString()}
       </p>
     </>

@@ -87,7 +87,7 @@ export default function DealForm({ deal }: DealFormProps) {
       <div>
         <label
           htmlFor="dealName"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-semibold text-gray-900"
         >
           Deal Name
         </label>
@@ -105,7 +105,7 @@ export default function DealForm({ deal }: DealFormProps) {
       <div>
         <label
           htmlFor="clientCompanyName"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-semibold text-gray-900"
         >
           Client Company Name
         </label>
@@ -124,7 +124,7 @@ export default function DealForm({ deal }: DealFormProps) {
         <div>
           <label
             htmlFor="dealValue"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-semibold text-gray-900"
           >
             Deal Value ($)
           </label>
@@ -144,7 +144,7 @@ export default function DealForm({ deal }: DealFormProps) {
         <div>
           <label
             htmlFor="grossProfit"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-semibold text-gray-900"
           >
             Gross Profit ($)
           </label>
@@ -165,7 +165,7 @@ export default function DealForm({ deal }: DealFormProps) {
       <div>
         <label
           htmlFor="stage"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-semibold text-gray-900"
         >
           Stage
         </label>

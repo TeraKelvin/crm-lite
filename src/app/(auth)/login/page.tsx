@@ -11,6 +11,45 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [devLoading, setDevLoading] = useState(false);
+
+  const handleDevLogin = async () => {
+    setError("");
+    setDevLoading(true);
+
+    try {
+      // Create dev user if needed and get credentials
+      const devResponse = await fetch("/api/auth/dev-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: "dev123" }),
+      });
+
+      if (!devResponse.ok) {
+        throw new Error("Dev login setup failed");
+      }
+
+      const { email: devEmail, password: devPassword } = await devResponse.json();
+
+      // Sign in with dev credentials
+      const result = await signIn("credentials", {
+        email: devEmail,
+        password: devPassword,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("Dev login failed");
+      } else {
+        router.push("/");
+        router.refresh();
+      }
+    } catch {
+      setError("Dev login failed");
+    } finally {
+      setDevLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +95,7 @@ export default function LoginPage() {
           )}
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-800">
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-900">
                 Email address
               </label>
               <input
@@ -71,7 +110,7 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-800">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-900">
                 Password
               </label>
               <input
@@ -102,6 +141,24 @@ export default function LoginPage() {
               Don&apos;t have an account? Register
             </Link>
           </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gray-50 text-gray-500">Dev Mode</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleDevLogin}
+            disabled={devLoading}
+            className="w-full flex justify-center py-2 px-4 border-2 border-dashed border-gray-300 rounded-md text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 hover:border-gray-400 focus:outline-none disabled:opacity-50 transition-colors"
+          >
+            {devLoading ? "Logging in..." : "Quick Dev Login (dev123)"}
+          </button>
         </form>
       </div>
     </div>

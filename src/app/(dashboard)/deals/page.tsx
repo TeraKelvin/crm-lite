@@ -43,12 +43,12 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
 
       {deals.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-12 text-center">
-          <p className="text-gray-500 mb-4">
+          <p className="text-gray-600 mb-4">
             {selectedStage
               ? "No deals found in this stage."
               : "No deals yet."}
           </p>
-          <Link href="/deals/new" className="text-blue-600 hover:underline">
+          <Link href="/deals/new" className="text-blue-600 hover:underline font-medium">
             Create your first deal
           </Link>
         </div>

@@ -85,7 +85,7 @@ export default async function DashboardPage() {
                   }`}
                 />
                 <p className="text-2xl font-bold text-gray-900">{count}</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-600 font-medium">
                   {stageLabels[stage as keyof typeof stageLabels]}
                 </p>
               </div>
@@ -105,9 +105,9 @@ export default async function DashboardPage() {
           </Link>
         </div>
         {recentDeals.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">
+          <p className="text-gray-600 text-center py-8">
             No deals yet.{" "}
-            <Link href="/deals/new" className="text-blue-600 hover:underline">
+            <Link href="/deals/new" className="text-blue-600 hover:underline font-medium">
               Create your first deal
             </Link>
           </p>

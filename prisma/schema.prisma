@@ -32,8 +32,23 @@ model Deal {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  salesRep User   @relation(fields: [salesRepId], references: [id])
-  files    File[]
+  salesRep   User       @relation(fields: [salesRepId], references: [id])
+  files      File[]
+  activities Activity[]
+}
+
+model Activity {
+  id           String    @id @default(uuid())
+  dealId       String
+  type         String    // CALL, EMAIL, MEETING, DEMO, NOTE
+  subject      String
+  notes        String?
+  activityDate DateTime  @default(now())
+  nextSteps    String?
+  nextStepsDue DateTime?
+  createdAt    DateTime  @default(now())
+
+  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
 }
 
 model File {

@@ -78,7 +78,7 @@ export default function RegisterPage() {
           <h1 className="text-center text-3xl font-bold text-gray-900">
             CRM-Lite
           </h1>
-          <h2 className="mt-6 text-center text-xl text-gray-600">
+          <h2 className="mt-6 text-center text-xl text-gray-700">
             Create your account
           </h2>
         </div>
@@ -90,7 +90,7 @@ export default function RegisterPage() {
           )}
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block text-sm font-semibold text-gray-900">
                 Full Name
               </label>
               <input
@@ -104,7 +104,7 @@ export default function RegisterPage() {
               />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-900">
                 Email address
               </label>
               <input
@@ -119,7 +119,7 @@ export default function RegisterPage() {
               />
             </div>
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="role" className="block text-sm font-semibold text-gray-900">
                 Account Type
               </label>
               <select
@@ -135,7 +135,7 @@ export default function RegisterPage() {
             </div>
             {formData.role === "CLIENT" && (
               <div>
-                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="companyName" className="block text-sm font-semibold text-gray-900">
                   Company Name
                 </label>
                 <input
@@ -150,7 +150,7 @@ export default function RegisterPage() {
               </div>
             )}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-900">
                 Password
               </label>
               <input
@@ -165,7 +165,7 @@ export default function RegisterPage() {
               />
             </div>
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-900">
                 Confirm Password
               </label>
               <input

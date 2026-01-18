@@ -19,14 +19,14 @@ export default function QuotaProgress({
       </h2>
       <div className="space-y-3">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">YTD Closed</span>
-          <span className="font-medium text-gray-900">
+          <span className="text-gray-700 font-medium">YTD Closed</span>
+          <span className="font-semibold text-gray-900">
             {formatCurrency(ytdClosed)}
           </span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Annual Goal</span>
-          <span className="font-medium text-gray-900">
+          <span className="text-gray-700 font-medium">Annual Goal</span>
+          <span className="font-semibold text-gray-900">
             {formatCurrency(salesGoal)}
           </span>
         </div>
@@ -58,7 +58,7 @@ export default function QuotaProgress({
           >
             {formatPercent(percentage)}
           </span>
-          <span className="text-gray-500 text-sm ml-1">of goal</span>
+          <span className="text-gray-600 text-sm ml-1">of goal</span>
         </div>
       </div>
     </div>
