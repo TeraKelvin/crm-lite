@@ -39,6 +39,9 @@ export default function DashboardLayout({
                     <Link href="/deals" className={navLinkClass("/deals")}>
                       Deals
                     </Link>
+                    <Link href="/help" className={navLinkClass("/help")}>
+                      Help
+                    </Link>
                   </>
                 ) : (
                   <Link
